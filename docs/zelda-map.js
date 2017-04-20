@@ -3,23 +3,9 @@ ZeldaMap.positions = [
   [0.5,0.5],
 ];
 
-ZeldaMap.init = function() {
-    var self = this;
-    var viewer = OpenSeadragon({
-        id:              "mapZelda",
-        prefixUrl:     "libs/openseadragon/images/",
-        maxZoomPixelRatio: 6.0,
-        tileSources:   [
-            "images/Zelda_BotW_map.dzi"
-        ]
-    });
-    var overlay = viewer.svgOverlay();
-    ZeldaMap.viewer=viewer;
-    ZeldaMap.overlay=overlay;
-
-    var zoomEl = document.querySelectorAll('#zoom')[0];
-
-    var clickMap= function(e) {
+ZeldaMap.helper={
+    clickMap: function(e) {
+      var viewer=ZeldaMap.viewer;
       console.log('map', e);
       var webPoint = e.position;
       var viewportPoint = viewer.viewport.pointFromPixel(webPoint);
@@ -38,11 +24,12 @@ ZeldaMap.init = function() {
         .attr("cx", viewportPoint.x)
         .attr("cy", viewportPoint.y)
         .attr("r", 0.001);
-    overlay.onClick(d3Rect.node(), clickIcon);
+    overlay.onClick(d3Rect.node(), ZeldaMap.helper.clickIcon);
       if(e.quick){
       }
-    }
-    var clickIcon = function(e) {
+    },
+    clickIcon: function(e) {
+      var viewer=ZeldaMap.viewer;
         //console.log('click', arguments);
         var webPoint = e.position;
         var viewportPoint = viewer.viewport.pointFromPixel(webPoint);
@@ -54,42 +41,45 @@ ZeldaMap.init = function() {
             '<br><br>Viewport:<br>' + viewportPoint.toString() +
             '<br><br>Image:<br>' + imagePoint.toString();
 
-    };
-    // for svg overlay
-    var overlay = viewer.svgOverlay();
-    var d3Rect = d3.select(overlay.node()).append("circle")
-        .style('fill', '#f00')
-        .attr("cx", 0.5)
-        .attr("cy", 0.5)
-        .attr("r", 0.001);
-    overlay.onClick(d3Rect.node(), clickIcon);
-    $(window).resize(function() {
-        overlay.resize();
-    });
-
-    // for mouse tracking
-    var count=0;
-
-    var updateZoom = function() {
+    },
+    updateZoom: function() {
+      var viewer=ZeldaMap.viewer;
         var zoom = viewer.viewport.getZoom(true);
         var imageZoom = viewer.viewport.viewportToImageZoom(zoom);
         var str = 'Zoom:<br>' + (Math.round(zoom * 100) / 100) + 
             '<br><br>Image Zoom:<br>' + (Math.round(imageZoom * 100) / 100) +
             '<br>';
 
+    var zoomEl = document.querySelectorAll('#zoom')[0];
         zoomEl.innerHTML = str;   
-    }
+    },
+};
+
+ZeldaMap.init = function() {
+    var self = this;
+    var viewer = OpenSeadragon({
+        id:              "mapZelda",
+        prefixUrl:     "libs/openseadragon/images/",
+        maxZoomPixelRatio: 6.0,
+        tileSources:   [
+            "images/Zelda_BotW_map.dzi"
+        ]
+    });
+    var overlay = viewer.svgOverlay();
+    ZeldaMap.viewer=viewer;
+    ZeldaMap.overlay=overlay;
+
+
+    // for svg overlay
+    var overlay = viewer.svgOverlay();
+    $(window).resize(function() {
+        overlay.resize();
+    });
+
+    // for mouse tracking
     var onOpen = function() {
-      /*
-      var tracker = new OpenSeadragon.MouseTracker({
-          element: viewer.container,
-      });  
-      tracker.setTracking(true);  
-      console.log(tracker);
-      */
-      //viewer.innerTracker.clickHandler=onClickH;
-      viewer.addHandler('animation', updateZoom);
-      viewer.addHandler('canvas-double-click',clickMap);
+      viewer.addHandler('animation', ZeldaMap.helper.updateZoom);
+      viewer.addHandler('canvas-double-click',ZeldaMap.helper.clickMap);
     }
     viewer.addHandler('open',onOpen);
     viewer.gestureSettingsMouse.clickToZoom=false;
