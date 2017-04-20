@@ -6,18 +6,52 @@
 
 		<title>ゼルダBotW全地図</title>
     <script src="libs/openseadragon/openseadragon.min.js"></script>
+    <script src="libs/openseadragon/openseadragon-svg-overlay.js"></script>
+    <script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
+    <script src="//d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="zelda-map.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            ZeldaMap.init();
+        });
+    </script>
+    <style type="text/css">
+    .map{
+      position: relative;
+      width: 100%; 
+      height: 95vh; 
+      margin: 0 auto;
+    }
+    .map .bg{
+      width: 100%; 
+      height: 100%;
+    }
+    .map .info{
+      position: absolute; 
+      top: 30px;
+      left: 0px;
+      width: 20%;
+      min-height:0px;
+      pointer-events: none;
+      background-color: rgba(255,255,255,0.2);
+    }
+    </style>
 	</head>
 	<body>
-      <div id="mapZelda" style="width: 95%; height: 95vh; margin: 0 auto;">
-        <script type="text/javascript">
-            OpenSeadragon({
-              id:              "mapZelda",
-              prefixUrl:     "libs/openseadragon/images/",
-              tileSources:   [
-                  "images/Zelda_BotW_map.dzi"
-              ]
-            });
-        </script>
+		<h2>ゼルダBotW全地図</h2>
+      <div class = "map">
+        <div class = "bg" id="mapZelda"></div>
+        <div class = "info">
+          <div id="position">
+          </div>
+          <div id="zoom">
+          </div>
+          <div id="click">
+          </div>
+        </div>
       </div>
+      <div class = "editor">
+      </div>
+        
 	</body>
 </html>
