@@ -1,0 +1,12 @@
+{
+  "Image": {
+    "xmlns": "http://schemas.microsoft.com/deepzoom/2008",
+    "Format": "png",
+    "Overlap": "1",
+    "TileSize": "512",
+    "Size": {
+      "Height": "8000",
+      "Width": "10020"
+    }
+  }
+}
