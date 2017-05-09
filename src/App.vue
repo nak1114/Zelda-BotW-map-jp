@@ -105,8 +105,9 @@ import OpenSeadragon, {Point} from 'openseadragon'
 import 'svg-overlay'
 import * as d3 from 'd3'
 
-var cclick = function (e) {
-  console.log('click', e)
+var cclick = function (e, idx, nodes) {
+  console.log('click', e, idx, nodes, this)
+  return false
 }
 
 export default {
