@@ -219,6 +219,10 @@ export default {
           .on('click', cclick)
       self.Zeldamap.icons = hoge
     })
+    viewer.gestureSettingsMouse.clickToZoom = false
+    viewer.gestureSettingsPen.clickToZoom = false
+    viewer.gestureSettingsTouch.clickToZoom = false
+    viewer.gestureSettingsUnknown.clickToZoom = false
   },
   methods: {
     updateZoom: function (e) {
