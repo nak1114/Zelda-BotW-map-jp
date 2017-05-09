@@ -157,9 +157,22 @@ export default {
 
     // var typedata2=["korok","main_quest","sub_quest","shrink_quest","shrink","tower","photo","private"]
     var typedata = ['mapicon', 'mapsub']
-    var tmp = d3.select(overlay.node()).selectAll('g').data(typedata).enter().append('g')
+    var icondata = ['korok']
+    d3.select(overlay.node()).selectAll('g').data(typedata).enter().append('g')
     .attr('id', function (d) { return d })
-    console.log(tmp)
+    d3.select(overlay.node().parentNode).append('defs').selectAll('pattern').data(icondata).enter().append('pattern')
+      .attr('id', function (d) { return 'icon_' + d })
+      .attr('x', '0%')
+      .attr('y', '0%')
+      .attr('height', '100%')
+      .attr('width', '100%')
+      .attr('viewBox', '0 0 512 512')
+      .append('image')
+      .attr('x', '0%')
+      .attr('y', '0%')
+      .attr('height', '512')
+      .attr('width', '512')
+      .attr('xlink:href', function (d) { return 'statics/images/icon_' + d + '.png' })
     var jsondata = [
       {
         type: 'korok',
