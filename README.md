@@ -1,6 +1,6 @@
 # Zelda-BotW-map-jp
 
-https://nak1114.github.io/Zelda-BotW-map-jp/
+[ページ](https://nak1114.github.io/Zelda-BotW-map-jp/)
 
 ## Build Setup
 
