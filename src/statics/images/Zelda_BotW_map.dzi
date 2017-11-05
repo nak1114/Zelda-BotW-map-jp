@@ -1,6 +1,7 @@
 {
   "Image": {
     "xmlns": "http://schemas.microsoft.com/deepzoom/2008",
+    "url": "statics/images/Zelda_BotW_map_files",
     "Format": "png",
     "Overlap": "1",
     "TileSize": "512",

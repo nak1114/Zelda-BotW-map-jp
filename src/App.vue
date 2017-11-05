@@ -77,7 +77,7 @@
 
       <!-- Main -->
       <div class="layout-view">
-        <div class="map">
+        <div class="map" v-bind:class="{maphide_korok: items[0][1], maphide_tower: items[2][1]}">
           <div class="mapbg" id="mapZelda"></div>
           <div class="info">
             <div id="position">
@@ -104,9 +104,26 @@
 import OpenSeadragon, {Point} from 'openseadragon'
 import 'svg-overlay'
 import * as d3 from 'd3'
+import Idx from 'components/Index'
+import lodash from 'lodash'
+import { Toast } from 'quasar'
+/*
+var cclick = function (e, idx, nodes) {
+  console.log('click', e, idx, nodes, this)
+  return false
+}
+*/
+var cclick = function (e, idx, nodes) {
+  console.log('click', e, idx, nodes, this)
+  return false
+}
+var jsonerror = function (response) {
+  if (!response.ok) {
+    var str = String(response.status) + ':' + response.url + ':' + response.statusText + ':'
+    throw Error(str)
+  }
 
-var cclick = function (e) {
-  console.log('click', e)
+  return response
 }
 
 export default {
@@ -129,7 +146,7 @@ export default {
     }
   },
   components: {
-    'my-top3': require('components/Index')
+    'my-top3': Idx
   },
   mounted () {
     var self = this
@@ -149,69 +166,138 @@ export default {
       ]
     })
     var overlay = viewer.svgOverlay()
-    this.Zeldamap.viewer = viewer
-    this.Zeldamap.overlay = overlay
-    this.Zeldamap.origin = new Point(3896.0, 5880.0)
-    window.addEventListener('resize', function () { overlay.resize() })
+    self.Zeldamap.viewer = viewer
+    self.Zeldamap.overlay = overlay
+    self.Zeldamap.origin = new Point(3896.0, 5880.0)
+    // window.addEventListener('resize', function () { overlay.resize() })
+    window.addEventListener('resize', lodash.debounce(function () { overlay.resize() }, 1000))
 
-    // var typedata2=["korok","main_quest","sub_quest","shrink_quest","shrink","tower","photo","private"]
     var typedata = ['mapicon', 'mapsub']
-    var tmp = d3.select(overlay.node()).selectAll('g').data(typedata).enter().append('g')
+    var icondata = ['korok', 'tower']
+    d3.select(overlay.node()).selectAll('g').data(typedata).enter().append('g')
     .attr('id', function (d) { return d })
-    console.log(tmp)
-    var jsondata = [
-      {
-        type: 'korok',
-        lat: 10,
-        lng: 10,
-        comment: 'hoge',
-        roots: [
-          {
-            lat: -10,
-            lng: -10,
-            comment: '01.切り株'
-          },
-          {
-            lat: -20,
-            lng: -10,
-            comment: '02.ゴール'
-          }
-        ]
-      },
-      {
-        type: 'korok',
-        lat: -10,
-        lng: 10,
-        comment: 'hogefg'
-      }
+    /*
+    d3.select(overlay.node().parentNode).append('defs').selectAll('pattern').data(icondata).enter().append('pattern')
+      .attr('id', function (d) { return 'icon_' + d })
+      .attr('x', '0%')
+      .attr('y', '0%')
+      .attr('height', '100%')
+      .attr('width', '100%')
+      .attr('viewBox', '0 0 512 512')
+      .append('image')
+      .attr('x', '0%')
+      .attr('y', '0%')
+      .attr('height', '512')
+      .attr('width', '512')
+      .attr('xlink:href', function (d) { return 'statics/images/icon_' + d + '.png' })
+    */
+    d3.select(overlay.node().parentNode).append('defs').selectAll('pattern').data(icondata).enter().append('pattern')
+      .attr('id', function (d) { return 'icon_' + d })
+      .attr('x', '0%')
+      .attr('y', '0%')
+      .attr('height', '100%')
+      .attr('width', '100%')
+      .attr('viewBox', '0 0 512 512')
+      .append('text')
+      .attr('x', '256')
+      .attr('y', '256')
+      .attr('font-size', '1')
+      .text(function (d) { return d.charAt(0) })
 
-    ]
-    viewer.addHandler('animation', self.updateZoom)
+    viewer.addHandler('zoom', lodash.debounce(self.updateZoom, 60))
 
     viewer.addHandler('open', function () {
       var vp2 = viewer.viewport.imageToViewportCoordinates(self.Zeldamap.origin)
       viewer.viewport.zoomTo(16)
       viewer.viewport.panTo(vp2)
 
-      jsondata.forEach(function (d, i) {
-        d.id = i
-        d.vp = viewer.viewport.imageToViewportCoordinates(d.lat + self.Zeldamap.origin.x, d.lng + self.Zeldamap.origin.y)
-      })
-      var hoge = d3.select('#mapicon').selectAll('circle').data(jsondata).enter().append('circle')
+      // 'https://gist.githubusercontent.com/nak1114/fc50653ce2da2c8d3189cc2fe5ebde19/raw/map.json'
+      fetch('statics/map.json', {mode: 'cors'})
+      .then(jsonerror)
+      .then(res => res.json())
+      .then(function (res) {
+        for (var i = 0; i < 2000; i++) {
+          var v = {
+            type: 'tower',
+            lat: Math.floor(Math.random() * (3896 + 6000)) - 3896,
+            lng: Math.floor(Math.random() * (5880 + 2000)) - 5880
+          }
+          res.push(v)
+        }
+        res.forEach(function (d, i) {
+          d.id = i
+          d.vp = viewer.viewport.imageToViewportCoordinates(d.lat + self.Zeldamap.origin.x, d.lng + self.Zeldamap.origin.y)
+        })
+        /*
+        for (var i = 0; i < 2000; i++) {
+          var v = {
+            type: 'tower',
+            lat: Math.floor(Math.random() * (3896 + 6000)) - 3896,
+            lng: Math.floor(Math.random() * (5880 + 2000)) - 5880
+          }
+          res.push(v)
+        }
+        hoge.append('circle')
           .attr('cx', function (d) { return d.vp.x })
           .attr('cy', function (d) { return d.vp.y })
-          .attr('r', 0.0001)
+          .attr('r', 0.001)
           .attr('class', function (d) { return 'map_' + d.type })
+        hoge.append('text')
+        var hoge = d3.select('#mapicon').selectAll('circle').data(res).enter().append('circle')
+            .attr('cx', function (d) { return d.vp.x })
+            .attr('cy', function (d) { return d.vp.y })
+            .attr('r', 0.001)
+            .attr('class', function (d) { return 'map_' + d.type })
+            .on('click', cclick)
+        */
+        var hoge = d3.select('#mapicon').selectAll('g').data(res).enter().append('g')
+          .attr('transform', function (d) { return 'translate(' + d.vp.x + ',' + d.vp.y + ')' })
           .on('click', cclick)
-      self.Zeldamap.icons = hoge
+          .append('g')
+          .attr('transform', function (d) { return 'scale(0.005)' })
+
+        hoge.append('circle')
+          .attr('class', function (d) { return 'map_' + d.type })
+          .attr('r', '0.7')
+        hoge.append('text')
+          .attr('font-size', '1')
+          .attr('y', '0.45')
+          .attr('class', function (d) { return 'map_' + d.type })
+          .text('\ue904')
+
+        self.Zeldamap.icons = hoge
+      })
+      .catch(function (res) {
+        Toast.create.negative({html: res.message, timeout: 0})
+        console.log(res)
+      })
     })
+    viewer.gestureSettingsMouse.clickToZoom = false
+    viewer.gestureSettingsPen.clickToZoom = false
+    viewer.gestureSettingsTouch.clickToZoom = false
+    viewer.gestureSettingsUnknown.clickToZoom = false
   },
   methods: {
+    updateZoomC: function (e) {
+      var i = this.Zeldamap.icons
+      if (i) {
+        // var zoom = this.Zeldamap.viewer.viewport.getZoom(true)
+        var zoom = 0.02 / e.zoom
+        i.attr('r', zoom)
+      }
+    },
     updateZoom: function (e) {
       var i = this.Zeldamap.icons
       if (i) {
-        var zoom = this.Zeldamap.viewer.viewport.getZoom(true)
-        i.attr('r', 0.02 / zoom)
+        // var zoom = this.Zeldamap.viewer.viewport.getZoom(true)
+        var zoom = 0.04 / e.zoom
+        // var str = 'translate(' + e.vp.x + ',' + e.vp.y + ')' + 'scale(' + zoom + ')'
+        var str = 'scale(' + zoom + ')'
+
+        i.attr('transform', str)
+        // i.attr('transform', function (d) { return 'translate(' + d.vp.x + ',' + d.vp.y + ')' + str })
+
+        // i.attr('data-dummy', str)
       }
     },
     map () {
@@ -244,17 +330,49 @@ export default {
   background-color: rgba(255, 255, 255, 0.2);
 }
 
-.maphide_korok .map_korok {
-  display: none;
+.map.maphide_korok .map_korok {
+  display: inline;
+}
+.map.maphide_tower .map_tower {
+  display: inline;
 }
 
-.map_korok {
-  fill: url(#icon_korok);
+text.map_korok {
+  font-family: icomoon;
+  display: none;
+  fill: #ff0;
+  text-anchor: middle;
+}
+
+text.map_tower {
+  font-family: icomoon;
+  display: none;
+  fill: #f00;
+  stroke: #0f0;
+  stroke-width: 0.0001;
+  text-anchor: middle;
 }
 
 .map_korok .map_fill {
+  dominant-baseline: middle;
+  text-anchor: middle;
+  fill: url(#icon_tower);
+  fill: url(#icon_korok);
+  display: none;
   fill: #f00;
   stroke: #0f0;
   stroke-width: 0.0001;
 }
+
+@font-face {
+  font-family: 'icomoon';
+  src:  url('statics/fonts/icomoon.eot?u789zf');
+  src:  url('statics/fonts/icomoon.eot?u789zf#iefix') format('embedded-opentype'),
+    url('statics/fonts/icomoon.ttf?u789zf') format('truetype'),
+    url('statics/fonts/icomoon.woff?u789zf') format('woff'),
+    url('statics/fonts/icomoon.svg?u789zf#icomoon') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
 </style>

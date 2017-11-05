@@ -1,0 +1,44 @@
+[
+  {
+    "type": "korok",
+    "lat": 10,
+    "lng": 10,
+    "comment": "'hoge'",
+    "roots": [
+      {
+        "lat": -10,
+        "lng": -10,
+        "comment": "'01.切り株'"
+      },
+      {
+        "lat": -20,
+        "lng": -10,
+        "comment": "'02.ゴール'"
+      }
+    ]
+  },
+  {
+    "type": "korok",
+    "lat": -10,
+    "lng": 10,
+    "comment": "'hogefg"
+  },
+  {
+    "type": "tower",
+    "lat": -10,
+    "lng": 30,
+    "comment": "'hogefg"
+  },
+  {
+    "type": "tower",
+    "lat": 6000,
+    "lng": 2000,
+    "comment": "'hogefg"
+  },
+  {
+    "type": "tower",
+    "lat": -3896.0,
+    "lng": -5880,
+    "comment": "'hogefg"
+  }
+]

@@ -11,3 +11,4 @@ cordova/plugins
 thumbs.db
 !.gitkeep
 png2dzi/*.png
+tmp/
