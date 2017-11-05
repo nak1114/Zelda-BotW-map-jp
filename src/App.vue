@@ -77,7 +77,7 @@
 
       <!-- Main -->
       <div class="layout-view">
-        <div class="map" v-bind:class="{maphide_korok: items[0][1], maphide_tower: items[2][1]}">
+        <div class="map" v-bind:class="{maphide_korok: items[0][1], maphide_tower: items[1][1]}">
           <div class="mapbg" id="mapZelda"></div>
           <div class="info">
             <div id="position">
@@ -130,8 +130,8 @@ export default {
   data () {
     return {
       items: [
-        ['コログの実', true],
-        ['祠・塔', false],
+        ['コログの実', false],
+        ['祠・塔', true],
         ['メインチャレンジ', true],
         ['サブチャレンジ', true],
         ['祠チャレンジ', true],
@@ -337,11 +337,19 @@ export default {
   display: inline;
 }
 
+.map_korok {
+  display: none;
+}
+
 text.map_korok {
   font-family: icomoon;
   display: none;
   fill: #ff0;
   text-anchor: middle;
+}
+
+.map_tower {
+  display: none;
 }
 
 text.map_tower {
